@@ -4,7 +4,7 @@ This replaces the earlier agent-control proposal. The workflow is now **observe 
 
 A Rust receiver and web dashboard are provided in [adviser/](../adviser/). They accept observation packets, display readable feedback, expose context to an external adviser, and validate its suggestions against a documented command policy. A separate patched client launcher publishes observations, and a separate Rust runner invokes a model adapter. Starting the dashboard alone does not start either process.
 
-**Implementation status:** the receiver now runs in Rust with the original v2 event/advice contracts and SQLite tables. The Python service remains a reference for parity tests. The client patch and continuous runner have synthetic integration tests; a designated live game and an authenticated model call still require operator validation.
+**Implementation status:** the receiver runs in Rust with the v2 event/advice contracts and SQLite tables. The client patch and continuous runner have synthetic integration tests; a designated live game and an authenticated model call still require operator validation.
 
 For a live run, the desktop client must keep sending its original Java messages to the configured AMEISE server **and** publish separate, redacted JSON observations to the local adviser API. An adviser process then polls that API for new context and posts advice back to it. The original simulator transport and the adviser HTTP API have different protocols and purposes; the same serialized packet cannot simply be sent to both addresses.
 
@@ -51,7 +51,7 @@ Alternatively, with Cargo available:
 ./adviser/run.sh
 ```
 
-The launcher builds and runs the Rust receiver using the committed Cargo lockfile. The first build downloads dependencies. After building, `adviser/target/debug/ameise-adviser` runs directly without Cargo or Python, while the repository supplies the dashboard assets and contracts.
+The launcher builds and runs the Rust receiver using the committed Cargo lockfile. The first build downloads dependencies. After building, `adviser/target/debug/ameise-adviser` runs directly without Cargo, while the repository supplies the dashboard assets and contracts.
 
 Open **http://127.0.0.1:8765**. The service serves the dashboard and API from the same local origin. It binds to loopback; it is not intended to be published to Sites hosting or a public server. The interface starts without live data. **Load demo** imports clearly marked synthetic events and example advice. **Import packets** accepts a JSON object, JSON array, or JSONL recording.
 
@@ -61,9 +61,9 @@ Starting the companion does not attach to `ClientV50.jar`, start an LLM, or gene
 
 ### Existing SQLite data
 
-Stop the Python receiver, then start `./adviser/run.sh` with the same `--data-dir` (the default remains `adviser/.runtime/`). The Rust receiver opens the existing `adviser.sqlite3` directly: the `streams`, `events` and `advice` table definitions are unchanged. No export, reset or destructive migration is performed. Duplicate checks compare parsed JSON values, preserving compatibility with Python's JSON encoding. Keep a copy of the data directory after stopping the service if you want a rollback backup. The Python reference can still read the same database.
+Stop any previous receiver using the data directory, then start `./adviser/run.sh` with the same `--data-dir` (the default remains `adviser/.runtime/`). The Rust receiver opens the existing `adviser.sqlite3` directly: the `streams`, `events` and `advice` table definitions are unchanged. No export, reset or destructive migration is performed. Duplicate checks compare parsed JSON values, preserving compatibility with existing records. Keep a copy of the data directory after stopping the service if you want a rollback backup.
 
-The Rust tests cover the meaningful Python reference cases, persistence, existing table compatibility, and actual HTTP requests against the Rust binary. See section 11 for commands.
+The Rust tests cover validation, persistence, existing table compatibility, and actual HTTP requests against the Rust binary. See section 11 for commands.
 
 ## 3. HTTP API
 
@@ -286,8 +286,6 @@ The implemented receiver/dashboard can be checked locally without a simulator ac
 ```sh
 cargo test --locked --manifest-path adviser/Cargo.toml
 ./adviser/client/test.sh
-# Optional Python reference parity suite:
-python3 -m unittest adviser.test_server
 ```
 
 The Java test script creates a local mock receiver (including temporary failure), verifies the patched classes with `-Xverify:all`, checks retry identity, callback history, wire-step IDs, restart streams and disabled publication, then feeds those generated packets through the Rust store. HTTP tests require permission to bind loopback sockets. No test contacts a simulator or calls a paid model.
@@ -312,7 +310,6 @@ Live integration requires a patched client JAR, not just edited decompiled sourc
 | Output and alternatives parsing | [ParsingTool.java](../ClientV50/sources/ameise/client/util/ParsingTool.java), `filter`, `parseAlternatives` |
 | Runtime dictionary and hidden commands | [SimulationGUIPlus.java](../ClientV50/sources/ameise/client/components/SimulationGUIPlus.java), `setDictionaryAndParameters` |
 | Rust receiver, validation and HTTP routes | [src/lib.rs](../adviser/src/lib.rs), [src/validation.rs](../adviser/src/validation.rs), [src/http.rs](../adviser/src/http.rs) |
-| Python parity reference | [server.py](../adviser/server.py), [test_server.py](../adviser/test_server.py) |
 | Client patch build and fixtures | [client/build.sh](../adviser/client/build.sh), [client/test.sh](../adviser/client/test.sh) |
 | Continuous runner and model adapter | [src/runner.rs](../adviser/src/runner.rs), [openai-adapter.rs](../adviser/src/bin/openai-adapter.rs), [run-agent.sh](../adviser/run-agent.sh) |
 | Agent operating instructions | [AGENT_GUIDELINES.md](../adviser/AGENT_GUIDELINES.md) |
