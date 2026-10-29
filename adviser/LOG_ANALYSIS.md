@@ -1,0 +1,31 @@
+# Retrospective of `log.md`
+
+This is one QS200-v19 simulation run, from October 2026 to July 2027. The log is human-readable client output, not an adviser v2 event stream; it has no event IDs or reliable machine-readable state transitions. The findings below guide future advice, but they do not prove that one alternative sequence would have succeeded.
+
+## Result against the current game's brief
+
+The opening brief sets a 2 July 2027 deadline, a €225,000 budget, at least 95% code and manual coverage, at most 12 code errors per KLOC and at most 0.5 manual errors per page ([opening brief](../log.md#L7)). The final customer evaluation rejected the product ([final evaluation](../log.md#L1178)).
+
+| Measure | Target | Delivered | Gap |
+| --- | ---: | ---: | ---: |
+| Delivery date | By 2 July 2027 | 14 July 2027 | 12 days late |
+| Cost | At most €225,000 | €229,980 | €4,980 over |
+| Code coverage | At least 95% | 94.6696% | 0.3304 percentage points short |
+| Code defects | At most 12/KLOC | 17.49/KLOC | 5.49/KLOC over |
+| Manual coverage | At least 95% | 93.3606% | 1.6394 percentage points short |
+| Manual defects | At most 0.5/page | 0.55/page | 0.05/page over |
+
+Using the final 200.88 required AFP, the 95% threshold is 190.836 AFP. The delivered code has 190.17 AFP (0.666 short) and the manuals 187.54 AFP (3.296 short). At 9,319 LOC, 12/KLOC permits at most 111 whole errors; the evaluation lists 163. At 248 pages, 0.5/page permits 124 errors; the evaluation lists 137. These calculations describe the delivered product only, not what an earlier inspection could have known exactly.
+
+## Decision signals visible before delivery
+
+1. **Source review ran late relative to downstream work.** System design was ready on 14 December ([log](../log.md#L210)), but its review began on 29 January, after code work began on 22 January ([coding](../log.md#L382), [review](../log.md#L415)). Module design review began in February while coding continued ([log](../log.md#L479)). The final evaluation attributes 81 of 163 code errors to analysis, 24 to system design and 19 to module design. That attribution makes earlier source checks a sensible priority, although this log cannot show how many defects earlier reviews would have prevented.
+2. **Coverage warnings were not turned into a clear gate.** On 5 January the manuals were estimated at 92–94%, entirely below the 95% target ([log](../log.md#L265)). On 25 February module design was estimated at 91–94% ([log](../log.md#L642)). Those were approximate inspections, but both warranted investigation. Later intervals often crossed 95%, so they could not establish readiness; the final module design covered 93.4%, code 94.67% and manuals 93.36% ([final evaluation](../log.md#L1178)). Repeated `write documentation` assignments and one later correction did not provide observed proof that the manual target was met ([January work](../log.md#L277), [March correction](../log.md#L720)).
+3. **Intermediate reports were easy to mistake for closure.** The system design report showed 7 errors and 0.9 missing AFP early, then 33 errors and 4.5 missing AFP after the review completed ([early](../log.md#L430), [later](../log.md#L547)). The module design report grew from 7 errors to 38 ([early](../log.md#L490), [later](../log.md#L646)); the code review report grew from 42 to 108 ([early](../log.md#L790), [later](../log.md#L894)). Corrections were assigned during some ongoing reviews. The adviser should track final report status and recheck findings after completion, rather than treating an accepted correction command or a provisional count as closure.
+4. **The manual review used one of its authors.** Bernd was writing the manuals, then joined Axel to review them ([writing](../log.md#L172), [review](../log.md#L233)). The project rules warn that author participation can weaken the whole review team ([project rules](../docs/README.md#managing-people-time-and-cost)). The log does not measure that effect in this run. No manual review-report inspection appears later in the recording, and there is no observed second manual review after the March correction.
+5. **A failed late correction remained unresolved.** On 22 June the integration test report listed 52 errors and 3.2 missing AFP ([log](../log.md#L1055)). Diana was assigned code correction, but Bernd's `correct all documents using Integrationtestreport` assignment returned `NOT SUCCESSFUL`; an activity check showed Bernd idle ([log](../log.md#L1068)). No successful retry appears. The failure's cause is not given, so the appropriate next step would have been to inspect prerequisites and report status, not assume the documents had been corrected.
+6. **The test and budget runway were exhausted.** Module testing finished in May with 77 errors and 1.4 missing AFP ([log](../log.md#L953)); integration testing ran in June and reported 52 errors and 3.2 missing AFP ([log](../log.md#L1023), [report](../log.md#L1055)). No explicit system-test or pre-delivery customer-acceptance-test command appears before delivery. On 22 June, spend was €212,940, leaving €12,060 and ten calendar days until the deadline ([log](../log.md#L1079)). Diana's integration-test code correction completed on 8 July; final integration ended on 12 July ([correction](../log.md#L1151), [integration](../log.md#L1166)). A quality loop that needs weeks cannot be compressed into the last ten days by advancing one day at a time.
+
+## Adviser changes prompted by this run
+
+The [agent guidelines](AGENT_GUIDELINES.md) now require a current, cited project ledger; separate estimated coverage from acceptance results; track reviews and tests through report closure; flag failed assignments; preserve independent review teams; and present a delivery readiness note with time and budget runway. These are decision checks for an external adviser. The current `adviser/` service stores observations and validates structured recommendations; it does not itself connect to the desktop client or generate model advice ([integration guide](../docs/json-api-integration.md)). This log cannot be directly replayed into the v2 API without an importer that assigns trustworthy event IDs, sequences and request/result relationships.

@@ -1,0 +1,311 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AMEISE observer event v2",
+  "description": "Local adviser observation format. Events describe observed client traffic or clearly marked demo/import data; ingestion never executes a simulator command. A command.sent event establishes submission only.",
+  "type": "object",
+  "required": [
+    "api_version",
+    "event_id",
+    "stream_id",
+    "sequence",
+    "occurred_at",
+    "source",
+    "kind",
+    "game",
+    "turn_id",
+    "payload"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "api_version": {
+      "const": "2"
+    },
+    "event_id": {
+      "$ref": "#/$defs/id"
+    },
+    "stream_id": {
+      "$ref": "#/$defs/id"
+    },
+    "sequence": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "occurred_at": {
+      "type": "string",
+      "format": "date-time",
+      "minLength": 1,
+      "maxLength": 64
+    },
+    "source": {
+      "enum": [
+        "ameise_client",
+        "import",
+        "demo"
+      ]
+    },
+    "kind": {
+      "enum": [
+        "game.selected",
+        "command.sent",
+        "command.result",
+        "callback.requested",
+        "transport.uncertain"
+      ]
+    },
+    "game": {
+      "$ref": "#/$defs/game"
+    },
+    "turn_id": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "payload": {
+      "type": "object"
+    }
+  },
+  "oneOf": [
+    {
+      "properties": {
+        "kind": {
+          "const": "game.selected"
+        },
+        "payload": {
+          "$ref": "#/$defs/selectedPayload"
+        }
+      }
+    },
+    {
+      "properties": {
+        "kind": {
+          "const": "command.sent"
+        },
+        "payload": {
+          "$ref": "#/$defs/sentPayload"
+        }
+      }
+    },
+    {
+      "properties": {
+        "kind": {
+          "const": "command.result"
+        },
+        "payload": {
+          "$ref": "#/$defs/resultPayload"
+        }
+      }
+    },
+    {
+      "properties": {
+        "kind": {
+          "const": "callback.requested"
+        },
+        "payload": {
+          "$ref": "#/$defs/callbackPayload"
+        }
+      }
+    },
+    {
+      "properties": {
+        "kind": {
+          "const": "transport.uncertain"
+        },
+        "payload": {
+          "$ref": "#/$defs/uncertainPayload"
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "text": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 65536
+    },
+    "command": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4096
+    },
+    "dateRaw": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "game": {
+      "type": "object",
+      "required": [
+        "game_id",
+        "tournament_id",
+        "model_instance_id"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "game_id": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "tournament_id": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "model_instance_id": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "selectedPayload": {
+      "type": "object",
+      "required": [
+        "name",
+        "simulation_date_raw"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "simulation_date_raw": {
+          "$ref": "#/$defs/dateRaw"
+        }
+      }
+    },
+    "sentPayload": {
+      "type": "object",
+      "required": [
+        "request_id",
+        "command"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "request_id": {
+          "$ref": "#/$defs/id"
+        },
+        "command": {
+          "$ref": "#/$defs/command"
+        }
+      }
+    },
+    "resultPayload": {
+      "type": "object",
+      "required": [
+        "request_id",
+        "command",
+        "feedback",
+        "kernel_output_raw",
+        "simulation_date_raw"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "request_id": {
+          "$ref": "#/$defs/id"
+        },
+        "command": {
+          "$ref": "#/$defs/command"
+        },
+        "feedback": {
+          "type": "string",
+          "maxLength": 65536
+        },
+        "kernel_output_raw": {
+          "type": "string",
+          "maxLength": 65536
+        },
+        "simulation_date_raw": {
+          "$ref": "#/$defs/dateRaw"
+        }
+      }
+    },
+    "callbackPayload": {
+      "type": "object",
+      "required": [
+        "request_id",
+        "command",
+        "question",
+        "choices",
+        "previous_answer_ids"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "request_id": {
+          "$ref": "#/$defs/id"
+        },
+        "command": {
+          "$ref": "#/$defs/command"
+        },
+        "question": {
+          "$ref": "#/$defs/text"
+        },
+        "choices": {
+          "type": "array",
+          "minItems": 0,
+          "maxItems": 256,
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "label"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "label": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 4096
+              }
+            }
+          }
+        },
+        "alternatives_raw": {
+          "type": "string",
+          "maxLength": 65536,
+          "description": "Optional unmodified alternatives from the upstream callback; retain when choices cannot be parsed."
+        },
+        "previous_answer_ids": {
+          "type": "array",
+          "minItems": 0,
+          "maxItems": 256,
+          "items": {
+            "type": "integer"
+          }
+        }
+      }
+    },
+    "uncertainPayload": {
+      "type": "object",
+      "required": [
+        "request_id",
+        "command",
+        "message"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "request_id": {
+          "$ref": "#/$defs/id"
+        },
+        "command": {
+          "$ref": "#/$defs/command"
+        },
+        "message": {
+          "$ref": "#/$defs/text"
+        }
+      }
+    }
+  }
+}

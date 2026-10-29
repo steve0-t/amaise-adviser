@@ -1,0 +1,51 @@
+{
+  "api_version": "2",
+  "advice_id": "demo-advice-1",
+  "stream_id": "demo-specification-review",
+  "based_on_revision": 7,
+  "policy_version": "qa200-1.95-v1",
+  "source": "demo",
+  "summary": "Synthetic example: inspect the review evidence before assigning corrections. All events and feedback in this stream are demo data.",
+  "observations": [
+    {
+      "text": "The synthetic review response acknowledges an assignment; it does not report review completion or findings.",
+      "evidence_event_ids": [
+        "demo-event-4",
+        "demo-event-5"
+      ]
+    },
+    {
+      "text": "The latest synthetic result reports a one-working-day advance to the raw simulation date 08.10.2024.",
+      "evidence_event_ids": [
+        "demo-event-7"
+      ]
+    }
+  ],
+  "recommendations": [
+    {
+      "command_id": "show_review_report",
+      "arguments": {},
+      "reason": "Read the report to establish whether review findings exist before choosing a correction.",
+      "evidence_event_ids": [
+        "demo-event-5",
+        "demo-event-7"
+      ]
+    },
+    {
+      "command_id": "show_activity",
+      "arguments": {
+        "developer": "Bernd"
+      },
+      "reason": "Check the observed reviewer activity before assigning another main task.",
+      "evidence_event_ids": [
+        "demo-event-4",
+        "demo-event-7"
+      ]
+    }
+  ],
+  "missing_information": [
+    "The review report contents and whether the review has finished.",
+    "Who authored the specification, and the current availability of both reviewers.",
+    "Measured specification quality; no completeness, defect, budget, or cost totals are supplied in this demo."
+  ]
+}

@@ -1,0 +1,1042 @@
+{
+  "policy_version": "qa200-1.95-v1",
+  "developers": [
+    "Axel",
+    "Bernd",
+    "Christine",
+    "Diana",
+    "Richard",
+    "Stefanie",
+    "Thomas"
+  ],
+  "commands": [
+    {
+      "id": "specify",
+      "label": "specify",
+      "group": "Specification",
+      "template": "{developer} specify",
+      "parameters": {
+        "developer": {
+          "type": "string",
+          "enum": [
+            "Axel",
+            "Bernd",
+            "Christine",
+            "Diana",
+            "Richard",
+            "Stefanie",
+            "Thomas"
+          ]
+        }
+      },
+      "recommendation": "allowed",
+      "reason": "Documented command. Recommend only when observed state supports its prerequisites; the adviser does not execute commands.",
+      "source": {
+        "file": "docs/AMAISE_commandlist-qa200-en-v1.95.pdf",
+        "page": 1
+      }
+    },
+    {
+      "id": "correct_specification",
+      "label": "correct specification",
+      "group": "Specification",
+      "template": "{developer} correct specification",
+      "parameters": {
+        "developer": {
+          "type": "string",
+          "enum": [
+            "Axel",
+            "Bernd",
+            "Christine",
+            "Diana",
+            "Richard",
+            "Stefanie",
+            "Thomas"
+          ]
+        }
+      },
+      "recommendation": "allowed",
+      "reason": "Documented correction command. Inspect the specification and review findings, and check the developer is available before recommending it.",
+      "source": {
+        "file": "docs/AMAISE_commandlist-qa200-en-v1.95.pdf",
+        "page": 1
+      }
+    },
+    {
+      "id": "show_specification",
+      "label": "show me specification",
+      "group": "Specification",
+      "template": "show me specification",
+      "parameters": {},
+      "recommendation": "allowed",
+      "reason": "Documented inspection command with immediate feedback. Use the returned text as evidence; do not infer unreported quality metrics.",
+      "source": {
+        "file": "docs/AMAISE_commandlist-qa200-en-v1.95.pdf",
+        "page": 1
+      }
+    },
+    {
+      "id": "talk_customer",
+      "label": "talk customer",
+      "group": "Specification",
+      "template": "{developer} talk customer",
+      "parameters": {
+        "developer": {
+          "type": "string",
+          "enum": [
+            "Axel",
+            "Bernd",
+            "Christine",
+            "Diana",
+            "Richard",
+            "Stefanie",
+            "Thomas"
+          ]
+        }
+      },
+      "recommendation": "allowed",
+      "reason": "Documentation: each meeting creates a new analysis document. Recommend only when another requirements discussion is justified by observed information.",
+      "source": {
+        "file": "docs/AMAISE_commandlist-qa200-en-v1.95.pdf",
+        "page": 1
+      }
+    },
+    {
+      "id": "design_system",
+      "label": "design system",
+      "group": "Design",
+      "template": "{developer} write system design",
+      "parameters": {
+        "developer": {
+          "type": "string",
+          "enum": [
+            "Axel",
+            "Bernd",
+            "Christine",
+            "Diana",
+            "Richard",
+            "Stefanie",
+            "Thomas"
+          ]
+        }
+      },
+      "recommendation": "allowed",
+      "reason": "Documented command. Recommend only when observed state supports its prerequisites; the adviser does not execute commands.",
+      "source": {
+        "file": "docs/AMAISE_commandlist-qa200-en-v1.95.pdf",
+        "page": 1
+      }
+    },
+    {
+      "id": "correct_system_design",
+      "label": "correct system design",
+      "group": "Design",
+      "template": "{developer} correct system design",
+      "parameters": {
+        "developer": {
+          "type": "string",
+          "enum": [
+            "Axel",
+            "Bernd",
+            "Christine",
+            "Diana",
+            "Richard",
+            "Stefanie",
+            "Thomas"
+          ]
+        }
+      },
+      "recommendation": "allowed",
+      "reason": "Documented command. Recommend only when observed state supports its prerequisites; the adviser does not execute commands.",
+      "source": {
+        "file": "docs/AMAISE_commandlist-qa200-en-v1.95.pdf",
+        "page": 1
+      }
+    },
+    {
+      "id": "show_system_design",
+      "label": "show me system design",
+      "group": "Design",
+      "template": "show me system design",
+      "parameters": {},
+      "recommendation": "allowed",
+      "reason": "Documented command. Recommend only when observed state supports its prerequisites; the adviser does not execute commands.",
+      "source": {
+        "file": "docs/AMAISE_commandlist-qa200-en-v1.95.pdf",
+        "page": 1
+      }
+    },
+    {
+      "id": "design_modules",
+      "label": "design modules",
+      "group": "Design",
+      "template": "{developer} write module design",
+      "parameters": {
+        "developer": {
+          "type": "string",
+          "enum": [
+            "Axel",
+            "Bernd",
+            "Christine",
+            "Diana",
+            "Richard",
+            "Stefanie",
+            "Thomas"
+          ]
+        }
+      },
+      "recommendation": "allowed",
+      "reason": "Documented command. Recommend only when observed state supports its prerequisites; the adviser does not execute commands.",
+      "source": {
+        "file": "docs/AMAISE_commandlist-qa200-en-v1.95.pdf",
+        "page": 1
+      }
+    },
+    {
+      "id": "correct_module_design",
+      "label": "correct module design",
+      "group": "Design",
+      "template": "{developer} correct module design",
+      "parameters": {
+        "developer": {
+          "type": "string",
+          "enum": [
+            "Axel",
+            "Bernd",
+            "Christine",
+            "Diana",
+            "Richard",
+            "Stefanie",
+            "Thomas"
+          ]
+        }
+      },
+      "recommendation": "allowed",
+      "reason": "Documented command. Recommend only when observed state supports its prerequisites; the adviser does not execute commands.",
+      "source": {
+        "file": "docs/AMAISE_commandlist-qa200-en-v1.95.pdf",
+        "page": 1
+      }
+    },
+    {
+      "id": "show_module_design",
+      "label": "show me module design",
+      "group": "Design",
+      "template": "show me module design",
+      "parameters": {},
+      "recommendation": "allowed",
+      "reason": "Documented command. Recommend only when observed state supports its prerequisites; the adviser does not execute commands.",
+      "source": {
+        "file": "docs/AMAISE_commandlist-qa200-en-v1.95.pdf",
+        "page": 1
+      }
+    },
+    {
+      "id": "code",
+      "label": "code",
+      "group": "Coding and module test",
+      "template": "{developer} write code",
+      "parameters": {
+        "developer": {
+          "type": "string",
+          "enum": [
+            "Axel",
+            "Bernd",
+            "Christine",
+            "Diana",
+            "Richard",
+            "Stefanie",
+            "Thomas"
+          ]
+        }
+      },
+      "recommendation": "allowed",
+      "reason": "Documented command. Recommend only when observed state supports its prerequisites; the adviser does not execute commands.",
+      "source": {
+        "file": "docs/AMAISE_commandlist-qa200-en-v1.95.pdf",
+        "page": 1
+      }
+    },
+    {
+      "id": "correct_reviewed_code",
+      "label": "correct reviewed code",
+      "group": "Coding and module test",
+      "template": "{developer} correct code",
+      "parameters": {
+        "developer": {
+          "type": "string",
+          "enum": [
+            "Axel",
+            "Bernd",
+            "Christine",
+            "Diana",
+            "Richard",
+            "Stefanie",
+            "Thomas"
+          ]
+        }
+      },
+      "recommendation": "allowed",
+      "reason": "Documented command. Recommend only when observed state supports its prerequisites; the adviser does not execute commands.",
+      "source": {
+        "file": "docs/AMAISE_commandlist-qa200-en-v1.95.pdf",
+        "page": 1
+      }
+    },
+    {
+      "id": "correct_tested_code",
+      "label": "correct tested code",
+      "group": "Coding and module test",
+      "template": "{developer} correct tested code using {report_name}",
+      "parameters": {
+        "developer": {
+          "type": "string",
+          "enum": [
+            "Axel",
+            "Bernd",
+            "Christine",
+            "Diana",
+            "Richard",
+            "Stefanie",
+            "Thomas"
+          ]
+        },
+        "report_name": {
+          "type": "string"
+        }
+      },
+      "recommendation": "allowed",
+      "reason": "Documented command. Recommend only when observed state supports its prerequisites; the adviser does not execute commands.",
+      "source": {
+        "file": "docs/AMAISE_commandlist-qa200-en-v1.95.pdf",
+        "page": 1
+      }
+    },
+    {
+      "id": "show_code",
+      "label": "show me code",
+      "group": "Coding and module test",
+      "template": "show me code",
+      "parameters": {},
+      "recommendation": "allowed",
+      "reason": "Documented command. Recommend only when observed state supports its prerequisites; the adviser does not execute commands.",
+      "source": {
+        "file": "docs/AMAISE_commandlist-qa200-en-v1.95.pdf",
+        "page": 1
+      }
+    },
+    {
+      "id": "test_modules",
+      "label": "test modules",
+      "group": "Coding and module test",
+      "template": "{developer} test modules",
+      "parameters": {
+        "developer": {
+          "type": "string",
+          "enum": [
+            "Axel",
+            "Bernd",
+            "Christine",
+            "Diana",
+            "Richard",
+            "Stefanie",
+            "Thomas"
+          ]
+        }
+      },
+      "recommendation": "allowed",
+      "reason": "Documented command. Recommend only when observed state supports its prerequisites; the adviser does not execute commands.",
+      "source": {
+        "file": "docs/AMAISE_commandlist-qa200-en-v1.95.pdf",
+        "page": 1
+      }
+    },
+    {
+      "id": "test_system",
+      "label": "test system",
+      "group": "Integration and system test",
+      "template": "{developer} test system",
+      "parameters": {
+        "developer": {
+          "type": "string",
+          "enum": [
+            "Axel",
+            "Bernd",
+            "Christine",
+            "Diana",
+            "Richard",
+            "Stefanie",
+            "Thomas"
+          ]
+        }
+      },
+      "recommendation": "allowed",
+      "reason": "Documented command. Recommend only when observed state supports its prerequisites; the adviser does not execute commands.",
+      "source": {
+        "file": "docs/AMAISE_commandlist-qa200-en-v1.95.pdf",
+        "page": 2
+      }
+    },
+    {
+      "id": "integrate",
+      "label": "integrate",
+      "group": "Integration and system test",
+      "template": "{developer} integrate",
+      "parameters": {
+        "developer": {
+          "type": "string",
+          "enum": [
+            "Axel",
+            "Bernd",
+            "Christine",
+            "Diana",
+            "Richard",
+            "Stefanie",
+            "Thomas"
+          ]
+        }
+      },
+      "recommendation": "allowed",
+      "reason": "Documentation summary: integration checks out the latest software versions. Reintegrate after relevant code corrections; check observed prerequisites and developer availability.",
+      "source": {
+        "file": "docs/AMAISE_commandlist-qa200-en-v1.95.pdf",
+        "page": 2
+      }
+    },
+    {
+      "id": "test_integration",
+      "label": "test integration",
+      "group": "Integration and system test",
+      "template": "{developer} do integration test",
+      "parameters": {
+        "developer": {
+          "type": "string",
+          "enum": [
+            "Axel",
+            "Bernd",
+            "Christine",
+            "Diana",
+            "Richard",
+            "Stefanie",
+            "Thomas"
+          ]
+        }
+      },
+      "recommendation": "allowed",
+      "reason": "Documented command. Recommend only when observed state supports its prerequisites; the adviser does not execute commands.",
+      "source": {
+        "file": "docs/AMAISE_commandlist-qa200-en-v1.95.pdf",
+        "page": 2
+      }
+    },
+    {
+      "id": "review_two_developers",
+      "label": "two developers review",
+      "group": "Review",
+      "template": "{reviewer_1} and {reviewer_2} review {document}",
+      "parameters": {
+        "reviewer_1": {
+          "type": "string",
+          "enum": [
+            "Axel",
+            "Bernd",
+            "Christine",
+            "Diana",
+            "Richard",
+            "Stefanie",
+            "Thomas"
+          ]
+        },
+        "reviewer_2": {
+          "type": "string",
+          "enum": [
+            "Axel",
+            "Bernd",
+            "Christine",
+            "Diana",
+            "Richard",
+            "Stefanie",
+            "Thomas"
+          ]
+        },
+        "document": {
+          "type": "string",
+          "enum": [
+            "specification",
+            "system design",
+            "module design",
+            "code",
+            "documentation"
+          ]
+        }
+      },
+      "recommendation": "allowed",
+      "reason": "Documented two-developer review form. Documentation summary advises using different reviewers who did not author the document; verify identities and availability first. The document enum is the default adviser allowlist of artifacts described in docs/README.md; the PDF uses a generic document-name placeholder.",
+      "source": {
+        "file": "docs/AMAISE_commandlist-qa200-en-v1.95.pdf",
+        "page": 2
+      }
+    },
+    {
+      "id": "review_three_developers",
+      "label": "three developers review",
+      "group": "Review",
+      "template": "instruct {reviewer_1} and {reviewer_2} and {reviewer_3} review {document}",
+      "parameters": {
+        "reviewer_1": {
+          "type": "string",
+          "enum": [
+            "Axel",
+            "Bernd",
+            "Christine",
+            "Diana",
+            "Richard",
+            "Stefanie",
+            "Thomas"
+          ]
+        },
+        "reviewer_2": {
+          "type": "string",
+          "enum": [
+            "Axel",
+            "Bernd",
+            "Christine",
+            "Diana",
+            "Richard",
+            "Stefanie",
+            "Thomas"
+          ]
+        },
+        "reviewer_3": {
+          "type": "string",
+          "enum": [
+            "Axel",
+            "Bernd",
+            "Christine",
+            "Diana",
+            "Richard",
+            "Stefanie",
+            "Thomas"
+          ]
+        },
+        "document": {
+          "type": "string",
+          "enum": [
+            "specification",
+            "system design",
+            "module design",
+            "code",
+            "documentation"
+          ]
+        }
+      },
+      "recommendation": "allowed",
+      "reason": "Documented three-developer review form, including the instruct prefix. Documentation summary advises distinct reviewers who did not author the document; verify identities and availability first. The document enum is the default adviser allowlist of artifacts described in docs/README.md; the PDF uses a generic document-name placeholder.",
+      "source": {
+        "file": "docs/AMAISE_commandlist-qa200-en-v1.95.pdf",
+        "page": 2
+      }
+    },
+    {
+      "id": "review_specification_with_customer",
+      "label": "customer participate in review specification",
+      "group": "Review",
+      "template": "customer and {reviewer_1} and {reviewer_2} review specification",
+      "parameters": {
+        "reviewer_1": {
+          "type": "string",
+          "enum": [
+            "Axel",
+            "Bernd",
+            "Christine",
+            "Diana",
+            "Richard",
+            "Stefanie",
+            "Thomas"
+          ]
+        },
+        "reviewer_2": {
+          "type": "string",
+          "enum": [
+            "Axel",
+            "Bernd",
+            "Christine",
+            "Diana",
+            "Richard",
+            "Stefanie",
+            "Thomas"
+          ]
+        }
+      },
+      "recommendation": "allowed",
+      "reason": "Documented customer review form. Verify the two developer reviewers are distinct, available, and did not author the specification, as advised by the documentation summary.",
+      "source": {
+        "file": "docs/AMAISE_commandlist-qa200-en-v1.95.pdf",
+        "page": 2
+      }
+    },
+    {
+      "id": "review_documentation_with_customer",
+      "label": "customer participate in review documentation",
+      "group": "Review",
+      "template": "customer and {reviewer_1} and {reviewer_2} review documentation",
+      "parameters": {
+        "reviewer_1": {
+          "type": "string",
+          "enum": [
+            "Axel",
+            "Bernd",
+            "Christine",
+            "Diana",
+            "Richard",
+            "Stefanie",
+            "Thomas"
+          ]
+        },
+        "reviewer_2": {
+          "type": "string",
+          "enum": [
+            "Axel",
+            "Bernd",
+            "Christine",
+            "Diana",
+            "Richard",
+            "Stefanie",
+            "Thomas"
+          ]
+        }
+      },
+      "recommendation": "allowed",
+      "reason": "Documented customer review form. Verify the two developer reviewers are distinct, available, and did not author the manuals, as advised by the documentation summary.",
+      "source": {
+        "file": "docs/AMAISE_commandlist-qa200-en-v1.95.pdf",
+        "page": 2
+      }
+    },
+    {
+      "id": "show_review_report",
+      "label": "show me review report",
+      "group": "Review",
+      "template": "show me review report",
+      "parameters": {},
+      "recommendation": "allowed",
+      "reason": "Documented report inspection with immediate feedback. A review assignment acknowledgement alone does not establish that the review has finished.",
+      "source": {
+        "file": "docs/AMAISE_commandlist-qa200-en-v1.95.pdf",
+        "page": 2
+      }
+    },
+    {
+      "id": "finish_review_document",
+      "label": "finish review document",
+      "group": "Review",
+      "template": "finish review document",
+      "parameters": {},
+      "recommendation": "excluded",
+      "reason": "Documentation: this command aborts the review. Default adviser policy excludes aborting a review from recommendations; the PDF lists it and does not impose this exclusion.",
+      "source": {
+        "file": "docs/AMAISE_commandlist-qa200-en-v1.95.pdf",
+        "page": 2
+      }
+    },
+    {
+      "id": "write_documentation",
+      "label": "write documentation",
+      "group": "Documentation",
+      "template": "{developer} write documentation",
+      "parameters": {
+        "developer": {
+          "type": "string",
+          "enum": [
+            "Axel",
+            "Bernd",
+            "Christine",
+            "Diana",
+            "Richard",
+            "Stefanie",
+            "Thomas"
+          ]
+        }
+      },
+      "recommendation": "allowed",
+      "reason": "Documented command. Recommend only when observed state supports its prerequisites; the adviser does not execute commands.",
+      "source": {
+        "file": "docs/AMAISE_commandlist-qa200-en-v1.95.pdf",
+        "page": 2
+      }
+    },
+    {
+      "id": "correct_documentation",
+      "label": "correct documentation",
+      "group": "Documentation",
+      "template": "{developer} correct documentation",
+      "parameters": {
+        "developer": {
+          "type": "string",
+          "enum": [
+            "Axel",
+            "Bernd",
+            "Christine",
+            "Diana",
+            "Richard",
+            "Stefanie",
+            "Thomas"
+          ]
+        }
+      },
+      "recommendation": "allowed",
+      "reason": "Documented command. Recommend only when observed state supports its prerequisites; the adviser does not execute commands.",
+      "source": {
+        "file": "docs/AMAISE_commandlist-qa200-en-v1.95.pdf",
+        "page": 2
+      }
+    },
+    {
+      "id": "show_documentation",
+      "label": "show me documentation",
+      "group": "Documentation",
+      "template": "show me documentation",
+      "parameters": {},
+      "recommendation": "allowed",
+      "reason": "Documented command. Recommend only when observed state supports its prerequisites; the adviser does not execute commands.",
+      "source": {
+        "file": "docs/AMAISE_commandlist-qa200-en-v1.95.pdf",
+        "page": 2
+      }
+    },
+    {
+      "id": "customer_acceptance_test",
+      "label": "customer perform acceptance test",
+      "group": "Deliver",
+      "template": "customer perform acceptance test",
+      "parameters": {},
+      "recommendation": "allowed",
+      "reason": "Documented command. Recommend only when observed state supports its prerequisites; the adviser does not execute commands.",
+      "source": {
+        "file": "docs/AMAISE_commandlist-qa200-en-v1.95.pdf",
+        "page": 2
+      }
+    },
+    {
+      "id": "deliver_system",
+      "label": "deliver system",
+      "group": "Deliver",
+      "template": "deliver system",
+      "parameters": {},
+      "recommendation": "manual_only",
+      "reason": "Documentation summary: delivery ends project work and starts final evaluation. Default adviser policy reserves this final decision for the user; this is not a PDF prohibition.",
+      "source": {
+        "file": "docs/AMAISE_commandlist-qa200-en-v1.95.pdf",
+        "page": 2
+      }
+    },
+    {
+      "id": "finish_project",
+      "label": "finish project",
+      "group": "Deliver",
+      "template": "finish project",
+      "parameters": {},
+      "recommendation": "excluded",
+      "reason": "Documentation: this command aborts the project. The documentation summary reports advice against it because it skips the full delivery evaluation. Default adviser policy therefore excludes it from recommendations.",
+      "source": {
+        "file": "docs/AMAISE_commandlist-qa200-en-v1.95.pdf",
+        "page": 2
+      }
+    },
+    {
+      "id": "quit_activity",
+      "label": "quit activity",
+      "group": "Personnel",
+      "template": "{developer} quit activity",
+      "parameters": {
+        "developer": {
+          "type": "string",
+          "enum": [
+            "Axel",
+            "Bernd",
+            "Christine",
+            "Diana",
+            "Richard",
+            "Stefanie",
+            "Thomas"
+          ]
+        }
+      },
+      "recommendation": "excluded",
+      "reason": "Documentation warning: aborts a developer activity immediately, has no effect on reviews, and should be avoided on a first simulation run. Default adviser policy excludes it from recommendations for every run.",
+      "source": {
+        "file": "docs/AMAISE_commandlist-qa200-en-v1.95.pdf",
+        "page": 3
+      }
+    },
+    {
+      "id": "finish_activity",
+      "label": "finish activity",
+      "group": "Personnel",
+      "template": "{developer} finish activity",
+      "parameters": {
+        "developer": {
+          "type": "string",
+          "enum": [
+            "Axel",
+            "Bernd",
+            "Christine",
+            "Diana",
+            "Richard",
+            "Stefanie",
+            "Thomas"
+          ]
+        }
+      },
+      "recommendation": "excluded",
+      "reason": "Documentation warning: finishes the current working package, has no effect on reviews, and should be avoided on a first simulation run. Default adviser policy excludes it from recommendations for every run.",
+      "source": {
+        "file": "docs/AMAISE_commandlist-qa200-en-v1.95.pdf",
+        "page": 3
+      }
+    },
+    {
+      "id": "release_developer",
+      "label": "release",
+      "group": "Personnel",
+      "template": "fire {developer}",
+      "parameters": {
+        "developer": {
+          "type": "string",
+          "enum": [
+            "Axel",
+            "Bernd",
+            "Christine",
+            "Diana",
+            "Richard",
+            "Stefanie",
+            "Thomas"
+          ]
+        }
+      },
+      "recommendation": "manual_only",
+      "reason": "Documentation: the display label release uses the wire verb fire. The documentation summary notes release prerequisites and possible unavailability for up to 60 days. Default adviser policy reserves staffing reductions for the user.",
+      "source": {
+        "file": "docs/AMAISE_commandlist-qa200-en-v1.95.pdf",
+        "page": 3
+      }
+    },
+    {
+      "id": "hire_developer",
+      "label": "hire",
+      "group": "Personnel",
+      "template": "hire {developer}",
+      "parameters": {
+        "developer": {
+          "type": "string",
+          "enum": [
+            "Axel",
+            "Bernd",
+            "Christine",
+            "Diana",
+            "Richard",
+            "Stefanie",
+            "Thomas"
+          ]
+        }
+      },
+      "recommendation": "allowed",
+      "reason": "Documented staffing command. The documentation summary notes that hired developers are paid while idle; recommend only for observed staffing needs and available developers.",
+      "source": {
+        "file": "docs/AMAISE_commandlist-qa200-en-v1.95.pdf",
+        "page": 3
+      }
+    },
+    {
+      "id": "developer_information",
+      "label": "information about developer",
+      "group": "Personnel",
+      "template": "information about {developer}",
+      "parameters": {
+        "developer": {
+          "type": "string",
+          "enum": [
+            "Axel",
+            "Bernd",
+            "Christine",
+            "Diana",
+            "Richard",
+            "Stefanie",
+            "Thomas"
+          ]
+        }
+      },
+      "recommendation": "allowed",
+      "reason": "Documented command. Recommend only when observed state supports its prerequisites; the adviser does not execute commands.",
+      "source": {
+        "file": "docs/AMAISE_commandlist-qa200-en-v1.95.pdf",
+        "page": 3
+      }
+    },
+    {
+      "id": "show_activity",
+      "label": "show me activity",
+      "group": "Personnel",
+      "template": "show activity of {developer}",
+      "parameters": {
+        "developer": {
+          "type": "string",
+          "enum": [
+            "Axel",
+            "Bernd",
+            "Christine",
+            "Diana",
+            "Richard",
+            "Stefanie",
+            "Thomas"
+          ]
+        }
+      },
+      "recommendation": "allowed",
+      "reason": "Documented inspection form: the display label differs from the wire syntax show activity of <name>. Inspect before assigning new work.",
+      "source": {
+        "file": "docs/AMAISE_commandlist-qa200-en-v1.95.pdf",
+        "page": 3
+      }
+    },
+    {
+      "id": "show_tasks",
+      "label": "show me tasks",
+      "group": "Personnel",
+      "template": "show tasks of {developer}",
+      "parameters": {
+        "developer": {
+          "type": "string",
+          "enum": [
+            "Axel",
+            "Bernd",
+            "Christine",
+            "Diana",
+            "Richard",
+            "Stefanie",
+            "Thomas"
+          ]
+        }
+      },
+      "recommendation": "allowed",
+      "reason": "Documented command. Recommend only when observed state supports its prerequisites; the adviser does not execute commands.",
+      "source": {
+        "file": "docs/AMAISE_commandlist-qa200-en-v1.95.pdf",
+        "page": 3
+      }
+    },
+    {
+      "id": "show_available_developers",
+      "label": "show me available developers",
+      "group": "Personnel",
+      "template": "show me available developers",
+      "parameters": {},
+      "recommendation": "allowed",
+      "reason": "Documented command. Recommend only when observed state supports its prerequisites; the adviser does not execute commands.",
+      "source": {
+        "file": "docs/AMAISE_commandlist-qa200-en-v1.95.pdf",
+        "page": 3
+      }
+    },
+    {
+      "id": "show_team_members",
+      "label": "show me my team members",
+      "group": "Personnel",
+      "template": "show me my team members",
+      "parameters": {},
+      "recommendation": "allowed",
+      "reason": "Documented command. Recommend only when observed state supports its prerequisites; the adviser does not execute commands.",
+      "source": {
+        "file": "docs/AMAISE_commandlist-qa200-en-v1.95.pdf",
+        "page": 3
+      }
+    },
+    {
+      "id": "spent_resources",
+      "label": "information about spent resources",
+      "group": "Project",
+      "template": "information about spent resources",
+      "parameters": {},
+      "recommendation": "allowed",
+      "reason": "Documented command. Recommend only when observed state supports its prerequisites; the adviser does not execute commands.",
+      "source": {
+        "file": "docs/AMAISE_commandlist-qa200-en-v1.95.pdf",
+        "page": 3
+      }
+    },
+    {
+      "id": "correct_all_documents",
+      "label": "correct all documents",
+      "group": "Project",
+      "template": "{developer} correct all documents using {report_name}",
+      "parameters": {
+        "developer": {
+          "type": "string",
+          "enum": [
+            "Axel",
+            "Bernd",
+            "Christine",
+            "Diana",
+            "Richard",
+            "Stefanie",
+            "Thomas"
+          ]
+        },
+        "report_name": {
+          "type": "string"
+        }
+      },
+      "recommendation": "allowed",
+      "reason": "Documented report-based correction form. The documentation summary suggests it when an earlier defect propagated to downstream artifacts; use an observed report name.",
+      "source": {
+        "file": "docs/AMAISE_commandlist-qa200-en-v1.95.pdf",
+        "page": 3
+      }
+    },
+    {
+      "id": "use_notation",
+      "label": "use notation",
+      "group": "Project",
+      "template": "use {notation} for {document}",
+      "parameters": {
+        "notation": {
+          "type": "string"
+        },
+        "document": {
+          "type": "string",
+          "enum": [
+            "specification",
+            "system design",
+            "module design",
+            "code",
+            "documentation"
+          ]
+        }
+      },
+      "recommendation": "manual_only",
+      "reason": "Documentation: selects a notation for a document. Default adviser policy reserves changes to artifact conventions for the user; the PDF does not prohibit this command. The document enum is the default adviser allowlist of artifacts described in docs/README.md; the PDF uses a generic document-name placeholder.",
+      "source": {
+        "file": "docs/AMAISE_commandlist-qa200-en-v1.95.pdf",
+        "page": 3
+      }
+    },
+    {
+      "id": "proceed_one_day",
+      "label": "Proceed one working day",
+      "group": "Simulation control",
+      "template": "proceed {days}",
+      "parameters": {
+        "days": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1
+        }
+      },
+      "recommendation": "allowed",
+      "reason": "Documented UI action in docs/README.md, absent from the PDF command list. SimulationPlus.java builds the wire form proceed <steps>. Default adviser policy limits each suggestion to one working day; confirm current feedback before suggesting another day. The adviser does not advance the simulator.",
+      "source": {
+        "file": "docs/README.md"
+      }
+    }
+  ]
+}
