@@ -1,0 +1,9 @@
+.direnv/
+*.ods
+*.xlsx
+Client-engine4/
+ClientV50/
+errors.log
+log.md
+login.txt
+printouts.log
