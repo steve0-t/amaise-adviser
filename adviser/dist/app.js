@@ -261,15 +261,21 @@
     };
     let [symbol, title, tone] = definitions[kind] || ["packet", kind, "neutral"];
     const resolvedCallback = kind === "callback.requested" && snapshot.events.some((entry) => entry.kind === "command.result" && entry.payload.request_id === payload.request_id && entry.sequence > event.sequence);
+    const supersededCallback = kind === "callback.requested" && snapshot.events.some((entry) => entry.kind === "callback.requested" && entry.payload.request_id === payload.request_id && entry.sequence > event.sequence);
     if (resolvedCallback) { title = "Client question · later result observed"; tone = "neutral"; }
+    else if (supersededCallback) { title = "Client question · replaced by a later question"; tone = "neutral"; }
     const body = node("div", { class: "event-body" }, node("div", { class: "event-heading" }, node("strong", {}, title), node("time", { datetime: event.occurred_at, title: event.occurred_at }, timeLabel(event.occurred_at))));
     if (payload.command) body.append(node("code", { class: "event-command" }, payload.command));
     if (kind === "game.selected") body.append(node("p", { class: "event-text" }, payload.name));
     if (kind === "command.sent") body.append(node("p", { class: "event-text text-muted" }, "Recorded as sent. Wait for client feedback to confirm the outcome."));
-    if (kind === "command.result") body.append(node("p", { class: "event-text" }, payload.feedback || "The client returned no feedback text."));
+    if (kind === "command.result") {
+      const readable = (text) => text.replace(/\x1e/g, "\n").replace(/@P/gi, "\n").replace(/@W/gi, "\nWarning: ").replace(/@E/gi, "\nError: ").trim();
+      body.append(node("p", { class: "event-text" }, readable(payload.feedback) || "The client returned no feedback text."));
+      if (payload.kernel_output_raw && payload.kernel_output_raw !== payload.feedback) body.append(node("p", { class: "event-text" }, readable(payload.kernel_output_raw)));
+    }
     if (kind === "transport.uncertain") body.append(node("p", { class: "event-text" }, payload.message));
     if (kind === "callback.requested") {
-      body.append(node("p", { class: "event-text" }, payload.question), node("div", { class: "callback-choices" }, ...payload.choices.map((choice) => node("span", {}, node("span", { class: "choice-number" }, String(choice.id)), choice.label))), node("p", { class: "callback-note" }, resolvedCallback ? "A later result was observed for this request. These choices are retained as history." : "Answer this question in the AMEISE client. The adviser cannot submit an answer."));
+      body.append(node("p", { class: "event-text" }, payload.question), node("div", { class: "callback-choices" }, ...payload.choices.map((choice) => node("span", {}, node("span", { class: "choice-number" }, String(choice.id)), choice.label))), node("p", { class: "callback-note" }, resolvedCallback ? "A later result was observed for this request. These choices are retained as history." : supersededCallback ? "A later question replaced this one. These choices are retained as history." : "Answer this question in the AMEISE client. The adviser cannot submit an answer."));
       if (!payload.choices.length) body.append(node("p", { class: "callback-note" }, "No structured answer options were supplied. Read the original client dialog."));
       if (payload.alternatives_raw) body.append(node("details", { class: "raw-details" }, node("summary", {}, "Original answer options"), node("pre", {}, payload.alternatives_raw)));
       if (payload.previous_answer_ids.length) body.append(node("p", { class: "callback-note" }, `Previous answer IDs: ${payload.previous_answer_ids.join(", ")}`));

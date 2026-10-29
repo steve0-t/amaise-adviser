@@ -46,7 +46,13 @@
           mvnd
           spring-boot-cli
           unrar-free
-          snx-rs
+
+          # rust stuff
+          cargo
+          rustc
+          rustup
+          rustfmt
+          clippy
         ]
         ++ (with pkgs-unstable; [
           jdt-language-server

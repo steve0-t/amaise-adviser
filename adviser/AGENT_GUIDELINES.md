@@ -9,6 +9,12 @@ You advise the human managing an AMEISE QA 200 simulation. The desktop client re
 3. Review only a changed revision, with one review in flight for a stream. Wait briefly for a burst of related events to settle. Tie every concrete observation and recommendation to event IDs in the supplied stream.
 4. Submit one object conforming to [the advice schema](../docs/adviser-advice.schema.json) to `POST /api/v2/advice`. Preserve the reviewed `stream_id`, `based_on_revision` and `policy_version`. A stale-context response requires a fresh review, not relabeling the old answer with a new revision.
 
+## Continuous operation
+
+When launched in continuous adviser mode, keep reviewing new revisions until the operator stops the runner. The API server listens for HTTP requests; your runner polls `GET /api/v2/context`, and you POST advice to `/api/v2/advice`. Do not open a simulator connection or wait for unsolicited packets on the API port. The detailed client and runner handoff is in the [integration guide](../docs/json-api-integration.md#10-run-a-continuous-adviser).
+
+The runner should poll at a modest interval, wait briefly for related packets to settle, and invoke you only when a selected stream's `revision` changes. Perform one review at a time per stream. Re-fetch context before submission; if its revision or policy changed, discard the draft and review the new context. Remember reviewed revisions, including across runner restarts by checking saved advice, so an unchanged revision does not trigger repeat model calls or duplicate advice. Back off while the local service is unavailable and resume when it returns. A one-off Codex/agent turn can perform a single review, but reading this file alone cannot start or sustain the runner; the host process must provide the loop and model invocations.
+
 ## Keep a current project picture
 
 Before choosing a recommendation, reconstruct a small ledger from the observed events: simulation date; this game's deadline, budget and latest reported spend; each artifact's latest coverage estimate; review/test completion and report status; developer authorship, hiring and activity; and whether code was corrected after the last completed integration. Cite the events that establish each fact. Mark missing or outdated facts as unknown. A later status observation can supersede an earlier one; an assignment acknowledgement cannot.

@@ -2,7 +2,11 @@
 
 This replaces the earlier agent-control proposal. The workflow is now **observe → explain → advise → human decision**. The existing AMEISE desktop client remains the application that communicates with the simulator and submits the user's actions.
 
-A runnable local receiver and web dashboard are provided in [adviser/](../adviser/). They accept observation packets, display readable feedback, expose context to an external adviser, and validate its suggestions against a documented command policy. The Java observation hook and an actual model-backed adviser process are integration work described below; they are not connected automatically by starting the dashboard.
+A Rust receiver and web dashboard are provided in [adviser/](../adviser/). They accept observation packets, display readable feedback, expose context to an external adviser, and validate its suggestions against a documented command policy. A separate patched client launcher publishes observations, and a separate Rust runner invokes a model adapter. Starting the dashboard alone does not start either process.
+
+**Implementation status:** the receiver now runs in Rust with the original v2 event/advice contracts and SQLite tables. The Python service remains a reference for parity tests. The client patch and continuous runner have synthetic integration tests; a designated live game and an authenticated model call still require operator validation.
+
+For a live run, the desktop client must keep sending its original Java messages to the configured AMEISE server **and** publish separate, redacted JSON observations to the local adviser API. An adviser process then polls that API for new context and posts advice back to it. The original simulator transport and the adviser HTTP API have different protocols and purposes; the same serialized packet cannot simply be sent to both addresses.
 
 ## 1. Data flow and responsibilities
 
@@ -10,7 +14,7 @@ A runnable local receiver and web dashboard are provided in [adviser/](../advise
 flowchart LR
     Human[You] --> Client[AMEISE desktop client]
     Client <--> Simulator[AMEISE server]
-    Client --> Observer[Planned observation hook]
+    Client --> Observer[Observation hook]
     Observer -->|JSON observations| Receiver[Local companion service]
     Receiver --> Dashboard[Web dashboard]
     Receiver -->|Context and evidence| Agent[Adviser agent]
@@ -35,23 +39,31 @@ There is no `command.execute`, `command.answer`, `game.select`, or simulator-log
 
 ## 2. Run the local companion
 
-From the repository root, use the development shell, which supplies Python:
+From the repository root, use the development shell, which supplies Cargo, Rust and JDK 8:
 
 ```sh
 nix develop --command ./adviser/run.sh
 ```
 
-Alternatively, with Python 3 available:
+Alternatively, with Cargo available:
 
 ```sh
-python3 adviser/server.py
+./adviser/run.sh
 ```
+
+The launcher builds and runs the Rust receiver using the committed Cargo lockfile. The first build downloads dependencies. After building, `adviser/target/debug/ameise-adviser` runs directly without Cargo or Python, while the repository supplies the dashboard assets and contracts.
 
 Open **http://127.0.0.1:8765**. The service serves the dashboard and API from the same local origin. It binds to loopback; it is not intended to be published to Sites hosting or a public server. The interface starts without live data. **Load demo** imports clearly marked synthetic events and example advice. **Import packets** accepts a JSON object, JSON array, or JSONL recording.
 
-The launcher's command-line options include `--port` and `--data-dir`. Runtime state is stored beneath `adviser/.runtime/` by default; keep recordings separate from source and credentials. See `python3 adviser/server.py --help` for the implemented options.
+The launcher's command-line options include `--port` and `--data-dir`. Runtime state is stored beneath `adviser/.runtime/` by default; keep recordings separate from source and credentials. See `./adviser/run.sh --help` for the implemented options.
 
-Starting the companion does not attach to `ClientV50.jar`, start an LLM, or generate real game observations. Until the observation hook is integrated, POST a sample event or import a recording to exercise the receiver and UI.
+Starting the companion does not attach to `ClientV50.jar`, start an LLM, or generate real game observations. Start the patched client and runner separately as described below, or POST a sample event/import a recording to exercise the receiver and UI.
+
+### Existing SQLite data
+
+Stop the Python receiver, then start `./adviser/run.sh` with the same `--data-dir` (the default remains `adviser/.runtime/`). The Rust receiver opens the existing `adviser.sqlite3` directly: the `streams`, `events` and `advice` table definitions are unchanged. No export, reset or destructive migration is performed. Duplicate checks compare parsed JSON values, preserving compatibility with Python's JSON encoding. Keep a copy of the data directory after stopping the service if you want a rollback backup. The Python reference can still read the same database.
+
+The Rust tests cover the meaningful Python reference cases, persistence, existing table compatibility, and actual HTTP requests against the Rust binary. See section 11 for commands.
 
 ## 3. HTTP API
 
@@ -191,39 +203,105 @@ There are no simulator controls in the browser. A pending callback directs the h
 
 Render imported feedback as text, preserving original strings in the inspector. The simulator output uses `@P`, `@W`, `@E` segments and control character 30 in some paths; display normalization may split these into readable lines but must not suppress warnings/errors. JSON strings and adviser prose are untrusted content for HTML rendering.
 
-## 9. Add the observation hook to ClientV50
+## 9. Build and run the observed ClientV50
 
-The receiver is implemented; these Java changes are integration guidelines for the next stage. The decompiled directory is not a clean rebuildable project. Preserve the original JAR's compiled protocol classes and serialization compatibility. Do not rebuild or replace every DTO just to add observation.
+The original client is [Client-engine4/ClientV50.jar](../Client-engine4/ClientV50.jar), launched by [launch_client.sh](../launch_client.sh). The observer build uses JDK 8's bundled ASM **at build time** to insert six small hook calls into the original `SendingUnit` and `LogicalUnit` bytecode. It adds the independently compiled [ObservationHook](../adviser/client/src/ameise/observer/ObservationHook.java) and packages a separate `ClientV50-observer.jar`. It does not rebuild the decompiled tree. The build verifies every original JAR entry: apart from those two client classes, all bytes, including the manifest, resources and serialized DTOs, must match. The build fails on an unexpected hook count or signed input JAR.
 
-1. **Selection:** after a successful continue-game response has established game/model/turn state, start a stream and enqueue `game.selected`. Preserve the returned original game/tournament identity. Do not publish passwords, password hashes, usernames, email addresses or entire `PersonData` objects.
-2. **Send:** in the existing sending path, after the message has been written/flushed, enqueue `command.sent` from its `CommandObject`. Allocate one observation `request_id` per emitted `CommandObject` before submission and preserve it while that command's interaction is pending. Callback-answer messages continue the same observed request. The next macro or Proceed step receives its own ID.
-3. **Receive:** observe `CommandResultObject` and `CallbackResultObject` in the existing reply path. Publish a result with its returned turn/feedback, or a question with real choice IDs. The existing client continues to process those objects normally. Wait hints and polling remain inside the existing client; do not forward a wait hint as a terminal result.
-4. **Failure:** when a write/read timeout or connection loss leaves the result uncertain, enqueue `transport.uncertain` if the process can still publish. A missing final event also leaves an unresolved sent command visible in the dashboard. Never retry a simulator action from the publisher.
-5. **Publication:** use a bounded background queue to POST immutable observations to localhost. Queue/network failure must not block Swing's event thread, change return values, skip normal message handling or terminate the simulator client. Report queue drops locally; sequence gaps make incomplete evidence visible to the receiver.
+```sh
+nix develop --command ./adviser/client/build.sh
+nix develop --command ./launch_observed_client.sh
+```
+
+`launch_observed_client.sh` builds the patched copy if absent. Re-run `build.sh` after changing hook code or replacing the original JAR. The original launcher still runs the original JAR. To compare patched behavior with observation disabled:
+
+```sh
+AMEISE_OBSERVER_ENABLED=false ./launch_observed_client.sh
+```
+
+Set `AMEISE_OBSERVER_URL` to change only the observer destination (default `http://127.0.0.1:8765/api/v2/events`). The 256-packet memory queue retries the same immutable event with 1-second connection and 1.5-second read timeouts and bounded backoff. Full queues and rejected packets are reported locally; sequence numbers are allocated before enqueueing. There is no disk spool: exiting the client loses undelivered packets. Keep the receiver running for capture. No passwords, account identities or serialized `PersonData` objects are copied into the observation envelope.
+
+Callbacks preserve raw alternatives and the complete numeric previous-answer sequence. **Structured choices are currently empty** because real callback fixtures have not established a safe parser; the dashboard directs the human to the original dialog. The legacy parser and callback submission behavior remain in the original client.
+
+The two destinations must remain independent:
+
+| Destination | Existing or new behavior | Data sent |
+| --- | --- | --- |
+| AMEISE server from [configClient.xml](../Client-engine4/configClient.xml) | Keep the current socket, request ordering, callbacks, polling and original `MessageObject` serialization. | The original simulator requests and replies. |
+| Adviser receiver, default `http://127.0.0.1:8765/api/v2/events` | Separate, bounded background HTTP publisher with an independently configurable URL. | JSON event v2 copies containing only the allowed observation fields. |
+
+Do not redirect the simulator socket, open a second simulator session, send a duplicate simulator command, or POST raw Java objects to the adviser. A local adviser failure must never determine whether an AMEISE request succeeds.
+
+The hook implements these observation points (receive hooks run after successful original processing and before GUI delivery can start another macro step):
+
+1. **Selection:** after a successful continue-game response has established game/model/turn state, start a stream and enqueue `game.selected`. Preserve the returned original game/tournament identity. Do not publish passwords, password hashes, usernames, email addresses or entire `PersonData` objects. A user-driven restart or branch switch begins a new stream.
+2. **Send:** in [SendingUnit.executeRequest](../ClientV50/sources/ameise/client/SendingUnit.java), leave the socket write/flush to `centralUnit.serverAddress/serverPort` in place. Once the write succeeds, enqueue `command.sent` from its `CommandObject` without waiting for the HTTP POST. Allocate one observation `request_id` per emitted `CommandObject` before submission and preserve it while that command's interaction is pending. Callback-answer messages continue the same observed request. Each later macro or multi-day Proceed wire step gets its own ID.
+3. **Receive:** observe `CommandResultObject` and `CallbackResultObject` in [ReceivingUnit](../ClientV50/sources/ameise/client/ReceivingUnit.java) and [LogicalUnit](../ClientV50/sources/ameise/client/LogicalUnit.java) after receiving the original simulator reply. Enqueue `command.result` with raw feedback/date, or `callback.requested` with the actual numeric choice IDs. Preserve the original reply path into the GUI. Wait hints and polling remain inside the existing client; do not publish a wait hint as a terminal result.
+4. **Failure:** when a write/read timeout or connection loss leaves the simulator outcome uncertain, enqueue `transport.uncertain` if possible. A missing final event also leaves an unresolved sent command visible in the dashboard. Never retry a simulator action from the observer publisher.
+5. **Publication:** allocate `sequence` before placing each immutable event in a bounded queue; assign a stable `event_id`, UTC `occurred_at`, the current `stream_id`, game identity and observed turn ID. A background worker POSTs the event as UTF-8 JSON to `/api/v2/events` with short connection/read timeouts. Queue/network failure must not block Swing's event thread, change return values, skip normal message handling or terminate the simulator client. Report dropped observations locally; sequence gaps make incomplete evidence visible to the receiver.
 
 The publisher may retry sending **the same observation packet** using its stable event ID. This is distinct from retrying the original simulator command. Keep the packet in a small local spool if reliable delivery across companion restarts is needed, and replay it in sequence when possible.
 
 The existing protocol uses `MessageObject(2, RequestManagerObject(2, CommandObject))` for commands, type 3/result 2 for terminal results, type 3/result 1 for callbacks, and type 3/result 3 for wait hints. These are the observation points; JSON packets must never be written onto the simulator's object-stream socket.
 
-For callback alternatives, the original parser has one-digit assumptions. Preserve the original alternatives when adapting it, and validate numeric ID parsing with real fixtures before publishing selectable choices. If choices cannot be interpreted, explain that limitation rather than inventing IDs or answering automatically. The currently accepted packet shape requires interpretable `choices`; an empty list can carry an unavailable selection while the human uses the original dialog.
+For callback alternatives, the original parser has one-digit assumptions. Preserve the original alternatives when adapting it, and validate numeric ID parsing with real fixtures before publishing selectable choices. If choices cannot be interpreted, explain that limitation rather than inventing IDs or answering automatically. The packet shape permits `choices: []` to represent unavailable structured options while the human uses the original dialog.
 
-## 10. Validation and completion boundaries
+## 10. Run a continuous adviser
+
+The API server listens; the agent is an HTTP **client** of that server. Start an agent runner on the same machine, or in an environment that can reach the configured loopback address. Give it [AGENT_GUIDELINES.md](../adviser/AGENT_GUIDELINES.md), the live [policy](adviser-command-policy.json), and the [advice schema](adviser-advice.schema.json). A one-off interactive agent turn can review once, but the guidelines file alone does not start a process or keep one alive. Continuous advice requires a persistent runner or scheduler around model invocations.
+
+### Included model runner
+
+The included runner reviews streams serially, polls every two seconds, and waits one second for a quiet revision. It supplies the full context, policy, advice schema, project README and agent guidelines to an adapter. The supplied OpenAI adapter uses the [Responses API JSON output format](https://developers.openai.com/api/docs/guides/structured-outputs?api-mode=responses); schema and policy validation remain local. It requests `store: false`, exposes no model tools, and reads credentials only from the environment.
+
+With `OPENAI_API_KEY` and `OPENAI_MODEL` already set in your shell:
+
+```sh
+nix develop --command ./adviser/run-agent.sh
+```
+
+Choose a model available to your API account that supports Responses JSON mode. This command sends the observed game context to OpenAI for review. It runs until Ctrl-C; no model calls are made merely by starting the receiver. Options include `--url`, `--poll-seconds`, `--quiet-seconds` and `--model-timeout`. The default model timeout is 180 seconds. Ctrl-C cancels polling and terminates the active adapter process.
+
+To use a different provider, run the Rust runner with your adapter executable:
+
+```sh
+cargo build --locked --manifest-path adviser/Cargo.toml --bins
+adviser/target/debug/adviser-runner -- /absolute/path/to/model-adapter arg1
+```
+
+The adapter reads one UTF-8 JSON object from stdin until EOF containing `instructions`, `project_rules`, `advice_schema`, and `context`. It writes exactly one complete v2 advice JSON object to stdout, diagnostics to stderr, and exits nonzero on failure. The runner validates the returned identity and replaces `advice_id` with a fresh transport ID. It rejects command recommendations from uncertain context before submission. Lost POST responses retain the exact draft; saved agent advice avoids duplicate reviews after restart. Invalid model output is logged and is not repeatedly regenerated at the same revision during that runner session. Restart the runner after fixing an adapter failure to retry an unreviewed revision.
+
+The runner's loop should:
+
+1. Poll `GET /api/v2/context` at a modest interval (for example, two seconds). Keep one active review per stream and remember which `stream_id`/`revision` has already been reviewed. On restart, consult the saved `advice` in context so the same revision is not posted again.
+2. When a new revision appears, wait briefly for a burst of related packets, fetch context again, and invoke the model only if that revision is still current. Read the complete policy and evidence, not just the latest packet. If the context reports uncertainty, the model may submit observations and missing-information notes but no command recommendations.
+3. Have the model produce one object conforming to the advice schema with `source: "agent"`, a fresh `advice_id`, the reviewed `stream_id`, `based_on_revision`, `policy_version` and evidence event IDs. Re-fetch context before posting; if its revision or policy changed, discard the draft and review again. Otherwise POST it to `/api/v2/advice`. The receiver validates and displays it; the runner must not submit simulator commands.
+4. If the POST returns `stale_advice` or `policy_conflict`, fetch new context and perform a new review. If a POST response is lost, retry the **same advice body and ID** so the receiver can recognize a duplicate. If the local service is unavailable, back off and retry the read later. Stop cleanly when the operator stops the runner; do not spin or invoke the model repeatedly on an unchanged revision.
+
+Start the receiver before the patched desktop client and runner when possible. Launch the runner separately; `./adviser/run.sh` starts only the receiver and dashboard. The observer should tolerate the receiver being temporarily unavailable; the runner should tolerate an empty stream until a game is selected. The human reads current advice in the dashboard and executes chosen actions in the original desktop client.
+
+## 11. Validation and completion boundaries
 
 The implemented receiver/dashboard can be checked locally without a simulator account. Use the backend tests from the repository root:
 
 ```sh
+cargo test --locked --manifest-path adviser/Cargo.toml
+./adviser/client/test.sh
+# Optional Python reference parity suite:
 python3 -m unittest adviser.test_server
 ```
 
+The Java test script creates a local mock receiver (including temporary failure), verifies the patched classes with `-Xverify:all`, checks retry identity, callback history, wire-step IDs, restart streams and disabled publication, then feeds those generated packets through the Rust store. HTTP tests require permission to bind loopback sockets. No test contacts a simulator or calls a paid model.
+
 Validate both JSON schemas, the synthetic events/advice, exact policy-template arguments, event deduplication/conflicts, cross-stream evidence, late events/revisions, stale advice, excluded/manual-only suggestions, pending questions, uncertain outcomes and the absence of execution routes. For the browser, verify empty/demo/import states, responsive layout, filters, raw inspection, copy behavior and stale/unknown labels.
 
-Live integration requires observing a designated game in the original client, confirming that the hook does not change its behavior, and comparing captured send/result/callback sequences with the dashboard. An actual adviser additionally needs a separately configured model/tool runner that reads context and submits validated advice. Neither live connection nor model execution is implied by the demo.
+Live integration requires a patched client JAR, not just edited decompiled source. With the observer disabled and with the adviser receiver unavailable, compare the patched client's simulator behavior to the original. Then observe a designated game, compare captured send/result/callback sequences with the dashboard, and verify that each client request still reaches the configured AMEISE server once. Exercise callback questions, multi-day Proceed, lost observation packets, receiver restart and a stale advice revision. Finally run the agent loop long enough to verify one review per changed revision, evidence-backed advice in the dashboard, and no model calls while context is unchanged. Neither live connection nor model execution is implied by the demo.
 
-## 11. Source map
+## 12. Source map
 
 | Concern | Reference |
 | --- | --- |
 | Rules and discouraged actions | [README.md](README.md), especially Using the simulator and Managing people, time, and cost |
+| Original client launcher and server destination | [launch_client.sh](../launch_client.sh), [configClient.xml](../Client-engine4/configClient.xml) |
 | Exact labels, syntax and abort behavior | [Command list PDF](AMAISE_commandlist-qa200-en-v1.95.pdf), pages 1–3 |
 | Client TCP send/flush | [SendingUnit.java](../ClientV50/sources/ameise/client/SendingUnit.java), `executeRequest` |
 | Reply handling, wait hints and polling | [ReceivingUnit.java](../ClientV50/sources/ameise/client/ReceivingUnit.java), `receive`, `run`, `poll` |
@@ -233,5 +311,8 @@ Live integration requires observing a designated game in the original client, co
 | Callback IDs and previous answers | [CallbackList.java](../ClientV50/sources/ameise/client/components/CallbackList.java), `valueChanged`, `addElementToOldAnswers` |
 | Output and alternatives parsing | [ParsingTool.java](../ClientV50/sources/ameise/client/util/ParsingTool.java), `filter`, `parseAlternatives` |
 | Runtime dictionary and hidden commands | [SimulationGUIPlus.java](../ClientV50/sources/ameise/client/components/SimulationGUIPlus.java), `setDictionaryAndParameters` |
-| Receiver implementation | [server.py](../adviser/server.py) |
+| Rust receiver, validation and HTTP routes | [src/lib.rs](../adviser/src/lib.rs), [src/validation.rs](../adviser/src/validation.rs), [src/http.rs](../adviser/src/http.rs) |
+| Python parity reference | [server.py](../adviser/server.py), [test_server.py](../adviser/test_server.py) |
+| Client patch build and fixtures | [client/build.sh](../adviser/client/build.sh), [client/test.sh](../adviser/client/test.sh) |
+| Continuous runner and model adapter | [src/runner.rs](../adviser/src/runner.rs), [openai-adapter.rs](../adviser/src/bin/openai-adapter.rs), [run-agent.sh](../adviser/run-agent.sh) |
 | Agent operating instructions | [AGENT_GUIDELINES.md](../adviser/AGENT_GUIDELINES.md) |
