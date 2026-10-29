@@ -46,6 +46,7 @@
           mvnd
           spring-boot-cli
           unrar-free
+          snx-rs
 
           # rust stuff
           cargo
